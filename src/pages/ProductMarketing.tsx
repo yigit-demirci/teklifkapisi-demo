@@ -147,6 +147,19 @@ const ProductMarketing: React.FC = () => {
         </div>
       </div>
 
+      {/* Submit Button */}
+      <div className="max-w-6xl mx-auto px-6 pb-8">
+        <motion.button
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+          className="btn-primary w-full flex items-center justify-center space-x-2"
+        >
+          <Package size={20} />
+          <span>Gönder</span>
+        </motion.button>
+      </div>
+
       {/* Chat Button */}
       <div className="fixed bottom-6 right-6">
         <button className="bg-primary-600 hover:bg-primary-700 text-white p-4 rounded-full shadow-lg transition-colors">

@@ -89,7 +89,7 @@ const PostJob: React.FC = () => {
 
           <div>
             <label className="block text-sm font-medium text-white mb-2">
-              Konum <span className="text-dark-500 text-xs">(İsteğe Bağlı)</span>
+              Konum <span className="text-red-500">*</span>
             </label>
             <div className="relative">
               <input
