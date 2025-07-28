@@ -1,0 +1,1758 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TeklifKapısı - İş Bulma Platformu Demo</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0f172a;
+            color: #f8fafc;
+        }
+        
+        .card {
+            background-color: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 12px;
+            padding: 24px;
+            transition: all 0.3s ease;
+        }
+        
+        .card:hover {
+            border-color: #3b82f6;
+            transform: translateY(-2px);
+        }
+        
+        .btn-primary {
+            background-color: #2563eb;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: background-color 0.2s ease;
+        }
+        
+        .btn-primary:hover {
+            background-color: #1d4ed8;
+        }
+        
+        .input-field {
+            background-color: #1e293b;
+            border: 1px solid #475569;
+            border-radius: 8px;
+            padding: 12px 16px;
+            color: white;
+            transition: border-color 0.2s ease;
+        }
+        
+        .input-field:focus {
+            outline: none;
+            border-color: #3b82f6;
+        }
+        
+        .page {
+            display: none;
+        }
+        
+        .page.active {
+            display: block;
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .notification-panel {
+            position: fixed;
+            right: 16px;
+            top: 80px;
+            width: 320px;
+            background-color: #1e293b;
+            border: 1px solid #ef4444;
+            border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            z-index: 50;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="bg-slate-800 border-b border-slate-700 px-6 py-4">
+        <div class="flex items-center justify-between">
+            <h1 class="text-2xl font-bold text-white cursor-pointer" onclick="showPage('home')">
+                TeklifKapısı
+            </h1>
+            
+                    <div class="flex items-center space-x-4">
+          <!-- Profile Modal Button -->
+          <button 
+            onclick="showProfileModal()"
+            class="flex items-center space-x-2 text-white hover:text-blue-400 transition-colors"
+          >
+            <i data-lucide="user" class="w-5 h-5"></i>
+            <span>Profil</span>
+          </button>
+
+          <!-- Company Modal Button -->
+          <button 
+            onclick="showCompanyModal()"
+            class="flex items-center space-x-2 text-white hover:text-blue-400 transition-colors"
+          >
+            <i data-lucide="building" class="w-5 h-5"></i>
+            <span>Şirket</span>
+          </button>
+          
+          <!-- Dark Mode Toggle -->
+          <button 
+            onclick="toggleDarkMode()"
+            class="flex items-center space-x-2 text-white hover:text-blue-400 transition-colors"
+            title="Tema değiştir"
+          >
+            <i data-lucide="moon" class="w-5 h-5" id="darkModeIcon"></i>
+            <span id="darkModeText">Koyu Tema</span>
+          </button>
+        </div>
+        </div>
+    </header>
+
+    <!-- Notification Panel -->
+    <div id="notificationPanel" class="notification-panel">
+        <div class="p-4">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-blue-400 font-semibold flex items-center">
+                    <i data-lucide="bell" class="w-4 h-4 mr-2"></i>
+                    Bildirimler
+                </h3>
+                <button onclick="closeNotificationPanel()" class="text-slate-500 hover:text-white transition-colors">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+
+            <div class="space-y-3">
+                <div class="bg-slate-700 rounded-lg p-3 border border-green-500/50">
+                    <div class="flex items-start justify-between">
+                        <div class="flex-1">
+                            <div class="flex items-center text-green-400 text-sm font-medium mb-1">
+                                <i data-lucide="check-circle" class="w-3 h-3 mr-1"></i>
+                                Profil Güncellendi
+                            </div>
+                            <p class="text-slate-400 text-xs mb-2">Profil bilgileriniz başarıyla güncellendi</p>
+                            <div class="text-xs text-slate-500">2 dakika önce</div>
+                        </div>
+                        <button class="text-slate-500 hover:text-white transition-colors ml-2">
+                            <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="bg-slate-700 rounded-lg p-3 border border-blue-500/50">
+                    <div class="flex items-start justify-between">
+                        <div class="flex-1">
+                            <div class="flex items-center text-blue-400 text-sm font-medium mb-1">
+                                <i data-lucide="info" class="w-3 h-3 mr-1"></i>
+                                Yeni İş İlanı
+                            </div>
+                            <p class="text-slate-400 text-xs mb-2">Kriterlerinize uygun 3 yeni iş ilanı bulundu</p>
+                            <div class="text-xs text-slate-500">15 dakika önce</div>
+                        </div>
+                        <button class="text-slate-500 hover:text-white transition-colors ml-2">
+                            <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="bg-slate-700 rounded-lg p-3 border border-yellow-500/50">
+                    <div class="flex items-start justify-between">
+                        <div class="flex-1">
+                            <div class="flex items-center text-yellow-400 text-sm font-medium mb-1">
+                                <i data-lucide="star" class="w-3 h-3 mr-1"></i>
+                                Premium Özellik
+                            </div>
+                            <p class="text-slate-400 text-xs mb-2">Premium üyeliğiniz aktif. Özel özelliklere erişebilirsiniz</p>
+                            <div class="text-xs text-slate-500">1 saat önce</div>
+                        </div>
+                        <button class="text-slate-500 hover:text-white transition-colors ml-2">
+                            <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profile Modal -->
+    <div id="profileModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4" style="display: none;">
+        <div class="bg-slate-800 rounded-lg shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+            <div class="p-8">
+                <!-- Modal Header -->
+                <div class="flex items-center justify-between mb-8">
+                    <h2 class="text-2xl font-bold text-white">Kişisel Profil</h2>
+                    <button onclick="hideProfileModal()" class="text-slate-500 hover:text-white transition-colors">
+                        <i data-lucide="x" class="w-6 h-6"></i>
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <!-- Left Column - Profile Info -->
+                    <div class="space-y-6">
+                        <!-- Profile Header -->
+                        <div class="text-center">
+                            <div class="relative inline-block mb-6">
+                                <img
+                                    src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face"
+                                    alt="Ahmet Yılmaz"
+                                    class="w-32 h-32 rounded-full border-4 border-blue-500"
+                                />
+                                <div class="absolute -top-2 -right-2 bg-blue-500 rounded-full p-2">
+                                    <i data-lucide="crown" class="w-4 h-4 text-white"></i>
+                                </div>
+                            </div>
+                            
+                            <h3 class="text-2xl font-bold text-white mb-2">İsmet Yiğit DEMİRCİ</h3>
+                            
+                            <div class="flex items-center justify-center space-x-4 text-slate-400 mb-4">
+                                <div class="flex items-center space-x-2">
+                                    <i data-lucide="map-pin" class="w-4 h-4"></i>
+                                    <span>Kadıköy, İstanbul</span>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <i data-lucide="calendar" class="w-4 h-4"></i>
+                                    <span>Üye: Mart 2024</span>
+                                </div>
+                            </div>
+
+                            <!-- Rating -->
+                            <div class="flex items-center justify-center space-x-2 mb-6">
+                                <div class="flex items-center space-x-1">
+                                    <i data-lucide="star" class="w-5 h-5 text-yellow-400 fill-current"></i>
+                                    <i data-lucide="star" class="w-5 h-5 text-yellow-400 fill-current"></i>
+                                    <i data-lucide="star" class="w-5 h-5 text-yellow-400 fill-current"></i>
+                                    <i data-lucide="star" class="w-5 h-5 text-yellow-400 fill-current"></i>
+                                    <i data-lucide="star" class="w-5 h-5 text-slate-500"></i>
+                                </div>
+                                <span class="text-lg text-slate-400">(4.8)</span>
+                            </div>
+                        </div>
+
+                        <!-- Bio -->
+                        <div>
+                            <h4 class="text-lg font-semibold text-white mb-3">Hakkımda</h4>
+                            <p class="text-slate-400 leading-relaxed">
+                                Bilgisayar Mühendisliği öğrencisi. React ve Node.js konularında deneyimli.
+                            </p>
+                        </div>
+
+                        <!-- Stats -->
+                        <div class="grid grid-cols-2 gap-6">
+                            <div class="text-center bg-slate-700 rounded-lg p-4">
+                                <div class="text-3xl font-bold text-blue-500">12</div>
+                                <div class="text-sm text-slate-400">Tamamlanan İş</div>
+                            </div>
+                            <div class="text-center bg-slate-700 rounded-lg p-4">
+                                <div class="text-3xl font-bold text-green-400">4.8</div>
+                                <div class="text-sm text-slate-400">Puan</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column - Skills & Actions -->
+                    <div class="space-y-6">
+                        <!-- Skills -->
+                        <div>
+                            <h4 class="text-lg font-semibold text-white mb-4">Yetenekler</h4>
+                            <div class="flex flex-wrap gap-3">
+                                <span class="bg-blue-500/20 text-blue-400 px-3 py-2 rounded-full border border-blue-500/30">React</span>
+                                <span class="bg-blue-500/20 text-blue-400 px-3 py-2 rounded-full border border-blue-500/30">Node.js</span>
+                                <span class="bg-blue-500/20 text-blue-400 px-3 py-2 rounded-full border border-blue-500/30">JavaScript</span>
+                                <span class="bg-blue-500/20 text-blue-400 px-3 py-2 rounded-full border border-blue-500/30">TypeScript</span>
+                                <span class="bg-blue-500/20 text-blue-400 px-3 py-2 rounded-full border border-blue-500/30">MongoDB</span>
+                            </div>
+                        </div>
+
+                        <!-- Interests -->
+                        <div>
+                            <h4 class="text-lg font-semibold text-white mb-4">İlgi Alanları</h4>
+                            <div class="flex flex-wrap gap-3">
+                                <span class="bg-slate-700 text-slate-400 px-3 py-2 rounded-full">Yazılım Geliştirme</span>
+                                <span class="bg-slate-700 text-slate-400 px-3 py-2 rounded-full">Web Tasarımı</span>
+                                <span class="bg-slate-700 text-slate-400 px-3 py-2 rounded-full">Freelance İşler</span>
+                            </div>
+                        </div>
+
+                        <!-- Quick Actions -->
+                        <div class="space-y-3">
+                            <button class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-lg transition-colors font-medium">
+                                Profili Düzenle
+                            </button>
+                            <button class="w-full bg-slate-700 hover:bg-slate-600 text-white py-3 px-6 rounded-lg transition-colors font-medium">
+                                Ayarlar
+                            </button>
+                            <button class="w-full bg-red-600 hover:bg-red-700 text-white py-3 px-6 rounded-lg transition-colors font-medium">
+                                Çıkış Yap
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Company Modal -->
+    <div id="companyModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4" style="display: none;">
+        <div class="bg-slate-800 rounded-lg shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+            <div class="p-8">
+                <!-- Modal Header -->
+                <div class="flex items-center justify-between mb-8">
+                    <h2 class="text-2xl font-bold text-white">Şirket Profili</h2>
+                    <button onclick="hideCompanyModal()" class="text-slate-500 hover:text-white transition-colors">
+                        <i data-lucide="x" class="w-6 h-6"></i>
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <!-- Left Column - Company Info -->
+                    <div class="space-y-6">
+                        <!-- Company Header -->
+                        <div class="text-center">
+                            <div class="relative inline-block mb-6">
+                                <img
+                                    src="https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=150&h=150&fit=crop"
+                                    alt="TechCorp Türkiye"
+                                    class="w-32 h-32 rounded-lg border-4 border-blue-500"
+                                />
+                                <div class="absolute -top-2 -right-2 bg-green-500 rounded-full p-2">
+                                    <i data-lucide="award" class="w-4 h-4 text-white"></i>
+                                </div>
+                            </div>
+                            
+                            <h3 class="text-2xl font-bold text-white mb-2">Demirci Yenilenebilir Enerji</h3>
+                            
+                            <div class="flex items-center justify-center space-x-4 text-slate-400 mb-4">
+                                <div class="flex items-center space-x-2">
+                                    <i data-lucide="building" class="w-4 h-4"></i>
+                                    <span>Yenilenebilir Enerji</span>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <i data-lucide="map-pin" class="w-4 h-4"></i>
+                                    <span>Maslak, İstanbul</span>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center justify-center space-x-2 text-slate-400 mb-6">
+                                <i data-lucide="calendar" class="w-4 h-4"></i>
+                                <span>Kuruluş: 2018</span>
+                            </div>
+
+                            <!-- Rating -->
+                            <div class="flex items-center justify-center space-x-2 mb-6">
+                                <div class="flex items-center space-x-1">
+                                    <i data-lucide="star" class="w-5 h-5 text-yellow-400 fill-current"></i>
+                                    <i data-lucide="star" class="w-5 h-5 text-yellow-400 fill-current"></i>
+                                    <i data-lucide="star" class="w-5 h-5 text-yellow-400 fill-current"></i>
+                                    <i data-lucide="star" class="w-5 h-5 text-yellow-400 fill-current"></i>
+                                    <i data-lucide="star" class="w-5 h-5 text-slate-500"></i>
+                                </div>
+                                <span class="text-lg text-slate-400">(4.6)</span>
+                            </div>
+                        </div>
+
+                        <!-- Company Description -->
+                        <div>
+                            <h4 class="text-lg font-semibold text-white mb-3">Hakkımızda</h4>
+                            <p class="text-slate-400 leading-relaxed">
+                                Türkiye'nin önde gelen yazılım şirketlerinden biri. Web ve mobil uygulama geliştirme konusunda uzman.
+                            </p>
+                        </div>
+
+                        <!-- Company Stats -->
+                        <div class="grid grid-cols-3 gap-4">
+                            <div class="text-center bg-slate-700 rounded-lg p-4">
+                                <div class="text-2xl font-bold text-blue-500">150</div>
+                                <div class="text-sm text-slate-400">Çalışan</div>
+                            </div>
+                            <div class="text-center bg-slate-700 rounded-lg p-4">
+                                <div class="text-2xl font-bold text-green-400">89</div>
+                                <div class="text-sm text-slate-400">Proje</div>
+                            </div>
+                            <div class="text-center bg-slate-700 rounded-lg p-4">
+                                <div class="text-2xl font-bold text-yellow-400">4.6</div>
+                                <div class="text-sm text-slate-400">Puan</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column - Specialties & Actions -->
+                    <div class="space-y-6">
+                        <!-- Specialties -->
+                        <div>
+                            <h4 class="text-lg font-semibold text-white mb-4">Uzmanlık Alanları</h4>
+                            <div class="flex flex-wrap gap-3">
+                                <span class="bg-blue-500/20 text-blue-400 px-3 py-2 rounded-full border border-blue-500/30">Web Geliştirme</span>
+                                <span class="bg-blue-500/20 text-blue-400 px-3 py-2 rounded-full border border-blue-500/30">Mobil Uygulama</span>
+                                <span class="bg-blue-500/20 text-blue-400 px-3 py-2 rounded-full border border-blue-500/30">AI/ML</span>
+                                <span class="bg-blue-500/20 text-blue-400 px-3 py-2 rounded-full border border-blue-500/30">Cloud Computing</span>
+                            </div>
+                        </div>
+
+                        <!-- Awards -->
+                        <div>
+                            <h4 class="text-lg font-semibold text-white mb-4">Ödüller</h4>
+                            <div class="space-y-3">
+                                <div class="flex items-center space-x-3 text-slate-400">
+                                    <i data-lucide="award" class="w-4 h-4 text-yellow-400"></i>
+                                    <span>En İyi Yazılım Şirketi 2023</span>
+                                </div>
+                                <div class="flex items-center space-x-3 text-slate-400">
+                                    <i data-lucide="award" class="w-4 h-4 text-yellow-400"></i>
+                                    <span>İnovasyon Ödülü 2022</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Quick Actions -->
+                        <div class="space-y-3">
+                            <button class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-lg transition-colors font-medium">
+                                Şirket Profilini Düzenle
+                            </button>
+                            <button class="w-full bg-slate-700 hover:bg-slate-600 text-white py-3 px-6 rounded-lg transition-colors font-medium">
+                                İş İlanı Ver
+                            </button>
+                            <button class="w-full bg-green-600 hover:bg-green-700 text-white py-3 px-6 rounded-lg transition-colors font-medium">
+                                Şirket Ayarları
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- Home Page -->
+    <div id="homePage" class="page active">
+        <div class="min-h-screen bg-slate-900">
+            <!-- Hero Section -->
+            <div class="text-center py-20 px-6">
+                <h1 class="text-6xl font-bold text-white mb-4 fade-in">
+                    TeklifKapısı
+                </h1>
+                
+                <p class="text-xl text-slate-400 mb-8 fade-in">
+                    Kariyerine, fikrine, yoluna teklif var
+                </p>
+
+                <!-- Features -->
+                <div class="flex justify-center space-x-8 mb-16 fade-in">
+                    <div class="flex items-center space-x-2 text-slate-500">
+                        <span class="text-lg">💬</span>
+                        <span class="text-sm">Gerçek zamanlı mesajlaşma</span>
+                    </div>
+                    <div class="flex items-center space-x-2 text-slate-500">
+                        <span class="text-lg">👑</span>
+                        <span class="text-sm">Premium üyelik sistemi</span>
+                    </div>
+                    <div class="flex items-center space-x-2 text-slate-500">
+                        <span class="text-lg">📍</span>
+                        <span class="text-sm">Konum bazlı sıralama</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Cards -->
+            <div class="max-w-7xl mx-auto px-6 pb-20">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <!-- İş Arıyorum Card -->
+                    <div class="card cursor-pointer" onclick="showPage('jobSearch')">
+                        <div class="flex items-center mb-4">
+                            <i data-lucide="search" class="w-8 h-8 text-blue-500"></i>
+                            <h3 class="text-xl font-semibold text-white ml-3">
+                                İş Arıyorum
+                            </h3>
+                        </div>
+                        
+                        <p class="text-slate-400 mb-6">
+                            Size uygun iş tekliflerini keşfedin
+                        </p>
+                        
+                        <ul class="space-y-2">
+                            <li class="flex items-center text-sm text-slate-500">
+                                <span class="w-1.5 h-1.5 bg-blue-500 rounded-full mr-3"></span>
+                                Part-Time İşler
+                            </li>
+                            <li class="flex items-center text-sm text-slate-500">
+                                <span class="w-1.5 h-1.5 bg-blue-500 rounded-full mr-3"></span>
+                                Yeni Mezunlar İçin İşler
+                            </li>
+                            <li class="flex items-center text-sm text-slate-500">
+                                <span class="w-1.5 h-1.5 bg-blue-500 rounded-full mr-3"></span>
+                                Stajyer Pozisyonları
+                            </li>
+                            <li class="flex items-center text-sm text-slate-500">
+                                <span class="w-1.5 h-1.5 bg-blue-500 rounded-full mr-3"></span>
+                                Uzmanlık Gerektiren Part-Time İşler
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Ürün Pazarla Card -->
+                    <div class="card cursor-pointer" onclick="showPage('productMarketing')">
+                        <div class="flex items-center mb-4">
+                            <i data-lucide="package" class="w-8 h-8 text-blue-500"></i>
+                            <h3 class="text-xl font-semibold text-white ml-3">
+                                Ürün Pazarla
+                            </h3>
+                        </div>
+                        
+                        <p class="text-slate-400 mb-6">
+                            Ürününüz için firma teklifleri alın
+                        </p>
+                        
+                        <ul class="space-y-2">
+                            <li class="flex items-center text-sm text-slate-500">
+                                <span class="w-1.5 h-1.5 bg-blue-500 rounded-full mr-3"></span>
+                                Ürün tanıtımı yapın
+                            </li>
+                            <li class="flex items-center text-sm text-slate-500">
+                                <span class="w-1.5 h-1.5 bg-blue-500 rounded-full mr-3"></span>
+                                Firmalara ulaşın
+                            </li>
+                            <li class="flex items-center text-sm text-slate-500">
+                                <span class="w-1.5 h-1.5 bg-blue-500 rounded-full mr-3"></span>
+                                Teklif alın
+                            </li>
+                            <li class="flex items-center text-sm text-slate-500">
+                                <span class="w-1.5 h-1.5 bg-blue-500 rounded-full mr-3"></span>
+                                İş birliği kurun
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- İş İlanı Ver Card -->
+                    <div class="card cursor-pointer" onclick="showPage('postJob')">
+                        <div class="flex items-center mb-4">
+                            <i data-lucide="building" class="w-8 h-8 text-blue-500"></i>
+                            <h3 class="text-xl font-semibold text-white ml-3">
+                                İş İlanı Ver
+                            </h3>
+                        </div>
+                        
+                        <p class="text-slate-400 mb-6">
+                            Çalışan adayları bulun
+                        </p>
+                        
+                        <ul class="space-y-2">
+                            <li class="flex items-center text-sm text-slate-500">
+                                <span class="w-1.5 h-1.5 bg-blue-500 rounded-full mr-3"></span>
+                                Hızlı ilan
+                            </li>
+                            <li class="flex items-center text-sm text-slate-500">
+                                <span class="w-1.5 h-1.5 bg-blue-500 rounded-full mr-3"></span>
+                                Premium öncelik
+                            </li>
+                            <li class="flex items-center text-sm text-slate-500">
+                                <span class="w-1.5 h-1.5 bg-blue-500 rounded-full mr-3"></span>
+                                Konum bazlı görünüm
+                            </li>
+                            <li class="flex items-center text-sm text-slate-500">
+                                <span class="w-1.5 h-1.5 bg-blue-500 rounded-full mr-3"></span>
+                                Başvuru yönetimi
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats -->
+            <div class="text-center py-12">
+                <div class="flex justify-center space-x-12 text-4xl font-bold text-white">
+                    <div>1000+</div>
+                    <div>500+</div>
+                    <div>5000+</div>
+                    <div>2000+</div>
+                </div>
+            </div>
+
+            <!-- Chat Button -->
+            <div class="fixed bottom-6 right-6">
+                <button class="bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-full shadow-lg transition-colors relative">
+                    <i data-lucide="message-circle" class="w-6 h-6"></i>
+                    <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                        1
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+            <!-- Job Search Page -->
+        <div id="jobSearchPage" class="page">
+            <div class="min-h-screen bg-slate-900">
+                <!-- Header -->
+                <div class="bg-slate-800 border-b border-slate-700 px-6 py-4">
+                    <div class="flex items-center space-x-4">
+                        <button onclick="showPage('home')" class="text-white hover:text-blue-400 transition-colors">
+                            <i data-lucide="arrow-left" class="w-6 h-6"></i>
+                        </button>
+                        <i data-lucide="search" class="w-6 h-6 text-blue-500"></i>
+                        <h1 class="text-xl font-semibold text-white">İş Arama</h1>
+                    </div>
+                </div>
+
+                <div class="max-w-6xl mx-auto px-6 py-8">
+                    <!-- Location Section -->
+                    <div class="card mb-8">
+                        <h2 class="text-xl font-semibold text-white mb-4">Konum Bilgisi</h2>
+                        <p class="text-slate-400 mb-6">
+                            Konumunuzu belirtirseniz size yakın iş ilanları öncelikli olarak gösterilir.
+                        </p>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-white mb-2">
+                                Konum (İsteğe Bağlı)
+                            </label>
+                            <div class="relative">
+                                <input
+                                    type="text"
+                                    placeholder="Örn: Kadıköy, İstanbul"
+                                    class="input-field w-full pl-10"
+                                />
+                                <i data-lucide="map-pin" class="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-500 w-5 h-5"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Job Categories -->
+                    <div class="mb-8">
+                        <h2 class="text-xl font-semibold text-white mb-6">İş Kategorisi Seçin</h2>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="card cursor-pointer" onclick="showJobCategory('partTime')">
+                                <div class="flex items-start space-x-4">
+                                    <span class="text-2xl">⏰</span>
+                                    <div class="flex-1">
+                                        <h3 class="text-lg font-semibold text-white mb-2">
+                                            Part-Time İşler
+                                        </h3>
+                                        <p class="text-slate-400 text-sm">
+                                            Esnek çalışma saatleri ile part-time pozisyonlar
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="card cursor-pointer" onclick="showJobCategory('newGraduates')">
+                                <div class="flex items-start space-x-4">
+                                    <span class="text-2xl">🎓</span>
+                                    <div class="flex-1">
+                                        <h3 class="text-lg font-semibold text-white mb-2">
+                                            Yeni Mezunlar İçin İşler
+                                        </h3>
+                                        <p class="text-slate-400 text-sm">
+                                            Kariyerine yeni başlayanlar için fırsatlar
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="card cursor-pointer" onclick="showJobCategory('internship')">
+                                <div class="flex items-start space-x-4">
+                                    <span class="text-2xl">📚</span>
+                                    <div class="flex-1">
+                                        <h3 class="text-lg font-semibold text-white mb-2">
+                                            Stajyer Pozisyonları
+                                        </h3>
+                                        <p class="text-slate-400 text-sm">
+                                            Deneyim kazanmak için staj imkanları
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="card cursor-pointer" onclick="showJobCategory('expertise')">
+                                <div class="flex items-start space-x-4">
+                                    <span class="text-2xl">💼</span>
+                                    <div class="flex-1">
+                                        <h3 class="text-lg font-semibold text-white mb-2">
+                                            Uzmanlık Gerektiren Part-Time İşler
+                                        </h3>
+                                        <p class="text-slate-400 text-sm">
+                                            Özel beceri gerektiren part-time pozisyonlar
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Job Listings -->
+                    <div id="jobListings" class="mb-8" style="display: none;">
+                        <h2 id="jobCategoryTitle" class="text-xl font-semibold text-white mb-6"></h2>
+                        
+                        <div id="jobListingsContent" class="space-y-6">
+                            <!-- Job listings will be populated here -->
+                        </div>
+                    </div>
+
+                    <!-- Sorting System -->
+                    <div class="card">
+                        <h2 class="text-xl font-semibold text-white mb-4">İlan Sıralama Sistemi</h2>
+                        <p class="text-slate-400 mb-4">Konum belirtirseniz:</p>
+                        
+                        <div class="space-y-3">
+                            <div class="flex items-center space-x-3">
+                                <span class="w-2 h-2 bg-blue-500 rounded-full"></span>
+                                <span class="text-slate-400">Premium + konuma uygun ilanlar</span>
+                            </div>
+                            <div class="flex items-center space-x-3">
+                                <span class="w-2 h-2 bg-blue-500 rounded-full"></span>
+                                <span class="text-slate-400">Konuma uygun ama Premium olmayan ilanlar</span>
+                            </div>
+                            <div class="flex items-center space-x-3">
+                                <span class="w-2 h-2 bg-blue-500 rounded-full"></span>
+                                <span class="text-slate-400">Premium ama konuma uymayan ilanlar</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    <!-- Product Marketing Page -->
+    <div id="productMarketingPage" class="page">
+        <div class="min-h-screen bg-slate-900">
+            <!-- Header -->
+            <div class="bg-slate-800 border-b border-slate-700 px-6 py-4">
+                <div class="flex items-center space-x-4">
+                    <button onclick="showPage('home')" class="text-white hover:text-blue-400 transition-colors">
+                        <i data-lucide="arrow-left" class="w-6 h-6"></i>
+                    </button>
+                    <i data-lucide="package" class="w-6 h-6 text-blue-500"></i>
+                    <h1 class="text-xl font-semibold text-white">Ürün Pazarlama</h1>
+                </div>
+            </div>
+
+            <div class="max-w-6xl mx-auto px-6 py-8">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <!-- Product Information -->
+                    <div class="space-y-6">
+                        <h2 class="text-2xl font-semibold text-white mb-6">Ürün Bilgileri</h2>
+                        
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-white mb-2">
+                                    Ürün Adı <span class="text-red-500">*</span>
+                                </label>
+                                <input
+                                    type="text"
+                                    placeholder="Ürününüzün adı"
+                                    class="input-field w-full"
+                                />
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-white mb-2">
+                                    Ürün Açıklaması <span class="text-red-500">*</span>
+                                </label>
+                                <textarea
+                                    placeholder="Ürününüzü detaylı olarak tanıtın..."
+                                    rows="4"
+                                    class="input-field w-full resize-none"
+                                ></textarea>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-white mb-2">
+                                    Ürün Linki <span class="text-slate-500 text-xs">(İsteğe Bağlı)</span>
+                                </label>
+                                <input
+                                    type="url"
+                                    placeholder="https://www.urunsite.com"
+                                    class="input-field w-full"
+                                />
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-white mb-2">
+                                    Ürün Görseli
+                                </label>
+                                <div class="border-2 border-dashed border-slate-600 rounded-lg p-8 text-center hover:border-blue-500 transition-colors cursor-pointer">
+                                    <i data-lucide="upload" class="mx-auto mb-4 text-slate-500 w-8 h-8"></i>
+                                    <p class="text-slate-400 mb-2">Dosyayı buraya sürükleyin veya tıklayın</p>
+                                    <p class="text-xs text-slate-500">Maksimum 2MB</p>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-white mb-2">
+                                    Firmalara Gönderilecek Mesaj <span class="text-red-500">*</span>
+                                </label>
+                                <textarea
+                                    rows="3"
+                                    class="input-field w-full resize-none"
+                                >Merhaba, size ürünümü tanıtmak istiyorum...</textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Target Companies -->
+                    <div class="space-y-6">
+                        <h2 class="text-2xl font-semibold text-white mb-6">Hedef Firmalar</h2>
+                        
+                        <div class="space-y-4">
+                            <div class="relative">
+                                <input
+                                    type="text"
+                                    placeholder="Firma ara..."
+                                    class="input-field w-full pl-10"
+                                />
+                                <i data-lucide="search" class="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-500 w-5 h-5"></i>
+                            </div>
+
+                            <div class="space-y-3 max-h-96 overflow-y-auto">
+                                <div class="card cursor-pointer hover:border-blue-500 transition-colors">
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <h3 class="font-semibold text-white">Arçelik</h3>
+                                            <p class="text-sm text-slate-400">Beyaz Eşya</p>
+                                        </div>
+                                        <input type="checkbox" class="w-4 h-4 text-blue-600 bg-slate-700 border-slate-600 rounded focus:ring-blue-500" />
+                                    </div>
+                                </div>
+
+                                <div class="card cursor-pointer hover:border-blue-500 transition-colors">
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <h3 class="font-semibold text-white">Ford</h3>
+                                            <p class="text-sm text-slate-400">Otomotiv</p>
+                                        </div>
+                                        <input type="checkbox" class="w-4 h-4 text-blue-600 bg-slate-700 border-slate-600 rounded focus:ring-blue-500" />
+                                    </div>
+                                </div>
+
+                                <div class="card cursor-pointer hover:border-blue-500 transition-colors">
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <h3 class="font-semibold text-white">Turkcell</h3>
+                                            <p class="text-sm text-slate-400">Telekomünikasyon</p>
+                                        </div>
+                                        <input type="checkbox" class="w-4 h-4 text-blue-600 bg-slate-700 border-slate-600 rounded focus:ring-blue-500" />
+                                    </div>
+                                </div>
+
+                                <div class="card cursor-pointer hover:border-blue-500 transition-colors">
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <h3 class="font-semibold text-white">Garanti BBVA</h3>
+                                            <p class="text-sm text-slate-400">Bankacılık</p>
+                                        </div>
+                                        <input type="checkbox" class="w-4 h-4 text-blue-600 bg-slate-700 border-slate-600 rounded focus:ring-blue-500" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chat Button -->
+            <div class="fixed bottom-6 right-6">
+                <button class="bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-full shadow-lg transition-colors">
+                    <i data-lucide="message-circle" class="w-6 h-6"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Post Job Page -->
+    <div id="postJobPage" class="page">
+        <div class="min-h-screen bg-slate-900">
+            <!-- Header -->
+            <div class="bg-slate-800 border-b border-slate-700 px-6 py-4">
+                <div class="flex items-center space-x-4">
+                    <button onclick="showPage('home')" class="text-white hover:text-blue-400 transition-colors">
+                        <i data-lucide="arrow-left" class="w-6 h-6"></i>
+                    </button>
+                    <i data-lucide="building" class="w-6 h-6 text-blue-500"></i>
+                    <h1 class="text-xl font-semibold text-white">İş İlanı Ver</h1>
+                </div>
+            </div>
+
+            <div class="max-w-2xl mx-auto px-6 py-8">
+                <div class="space-y-6">
+                    <div>
+                        <label class="block text-sm font-medium text-white mb-2">
+                            İş Başlığı <span class="text-red-500">*</span>
+                        </label>
+                        <input
+                            type="text"
+                            placeholder="Örn: Part-Time Garson"
+                            class="input-field w-full"
+                        />
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-white mb-2">
+                            Şirket Adı <span class="text-red-500">*</span>
+                        </label>
+                        <input
+                            type="text"
+                            placeholder="Şirket adınız"
+                            class="input-field w-full"
+                        />
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-white mb-2">
+                            Kategori <span class="text-red-500">*</span>
+                        </label>
+                        <select class="input-field w-full">
+                            <option>Kategori seçin</option>
+                            <option>Part-Time İş</option>
+                            <option>Yeni Mezunlara Yönelik İş</option>
+                            <option>Stajyer Pozisyonu</option>
+                            <option>Uzmanlık Gerektiren Part-Time İş</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-white mb-2">
+                            Konum <span class="text-slate-500 text-xs">(İsteğe Bağlı)</span>
+                        </label>
+                        <div class="relative">
+                            <input
+                                type="text"
+                                placeholder="Örn: Kadıköy, İstanbul"
+                                class="input-field w-full pl-10"
+                            />
+                            <i data-lucide="map-pin" class="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-500 w-5 h-5"></i>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-white mb-2">
+                            Maaş Bilgisi <span class="text-red-500">*</span>
+                        </label>
+                        <input
+                            type="text"
+                            placeholder="Örn: 15.000 - 20.000 TL"
+                            class="input-field w-full"
+                        />
+                    </div>
+
+                    <!-- Premium Option -->
+                    <div class="card">
+                        <div class="flex items-start space-x-3">
+                            <input
+                                type="checkbox"
+                                class="w-5 h-5 text-blue-600 bg-slate-700 border-slate-600 rounded focus:ring-blue-500 mt-1"
+                            />
+                            <div class="flex-1">
+                                <div class="flex items-center space-x-2 mb-2">
+                                    <i data-lucide="crown" class="w-5 h-5 text-blue-500"></i>
+                                    <span class="font-semibold text-white">Premium İlan Yap</span>
+                                </div>
+                                <p class="text-sm text-slate-400">
+                                    Premium ilanlar seçilen kategoride öncelikli olarak gösterilir ve daha fazla görünürlük sağlar.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button class="btn-primary w-full flex items-center justify-center space-x-2">
+                        <i data-lucide="file-text" class="w-5 h-5"></i>
+                        <span>İlanı Yayınla</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Chat Button -->
+            <div class="fixed bottom-6 right-6">
+                <button class="bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-full shadow-lg transition-colors">
+                    <i data-lucide="message-circle" class="w-6 h-6"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chat Button -->
+    <button id="chatButton" onclick="toggleChat()" class="fixed bottom-6 right-6 bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-full shadow-lg transition-all duration-300 z-50">
+        <i data-lucide="message-circle" class="w-6 h-6"></i>
+    </button>
+
+    <!-- Chat Panel -->
+    <div id="chatWindow" class="fixed bottom-6 right-6 bg-slate-800 border border-slate-700 rounded-lg shadow-2xl z-50 w-[800px] h-[600px] flex" style="display: none;">
+        
+        <!-- Left Side - Conversation List -->
+        <div class="w-1/2 border-r border-slate-700 flex flex-col">
+            
+            <!-- Header -->
+            <div class="p-4 border-b border-slate-700 bg-slate-700">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="text-white font-semibold">Mesajlar</h3>
+                        <p class="text-xs text-slate-400">1 okunmamış mesaj</p>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <button class="text-slate-500 hover:text-white transition-colors p-1">
+                            <i data-lucide="plus" class="w-4 h-4"></i>
+                        </button>
+                        <button class="text-slate-500 hover:text-white transition-colors p-1">
+                            <i data-lucide="settings" class="w-4 h-4"></i>
+                        </button>
+                        <button onclick="toggleChat()" class="text-slate-500 hover:text-white transition-colors p-1">
+                            <i data-lucide="x" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Search Bar -->
+            <div class="p-4 border-b border-slate-700">
+                <div class="relative">
+                    <i data-lucide="search" class="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-500 w-4 h-4"></i>
+                    <input
+                        type="text"
+                        placeholder="Konuşma ara..."
+                        class="w-full bg-slate-700 border border-slate-600 rounded-lg pl-10 pr-4 py-2 text-white placeholder-slate-400 focus:border-blue-500 focus:outline-none text-sm"
+                    />
+                </div>
+            </div>
+
+            <!-- Filters -->
+            <div class="p-4 border-b border-slate-700">
+                <div class="flex items-center space-x-4 text-sm">
+                                    <button onclick="handleFilterClick('completed')" class="text-blue-400 border-b border-blue-400 pb-1">
+                    Tamamlanmış (1)
+                </button>
+                <button onclick="handleFilterClick('online')" class="text-slate-500 hover:text-white transition-colors">
+                    Çevrimiçi (7)
+                </button>
+                <button onclick="handleFilterClick('archive')" class="text-slate-500 hover:text-white transition-colors">
+                    Arşiv
+                </button>
+                </div>
+            </div>
+
+            <!-- Conversation List -->
+            <div class="flex-1 overflow-y-auto">
+                <div class="p-4 border-b border-slate-700 cursor-pointer transition-colors bg-slate-700" onclick="selectConversation(1)">
+                    <div class="flex items-start space-x-3">
+                        <div class="relative">
+                            <div class="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white font-semibold">
+                                TH
+                            </div>
+                            <div class="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-slate-800"></div>
+                        </div>
+                        
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center justify-between">
+                                <h4 class="text-white font-medium truncate">TechCorp HR</h4>
+                                <span class="text-xs text-slate-400">1 yıldan fazla önce</span>
+                            </div>
+                            
+                            <div class="flex items-center justify-between mt-1">
+                                <p class="text-sm text-slate-400 truncate">Merhaba tabii ki. Bu pozisyon için React ve TypeScript deneyimi arıyoruz. Daha detaylı konuşabilir miyiz?</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="p-4 border-b border-slate-700 cursor-pointer transition-colors hover:bg-slate-700" onclick="selectConversation(2)">
+                    <div class="flex items-start space-x-3">
+                        <div class="relative">
+                            <div class="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white font-semibold">
+                                KA
+                            </div>
+                        </div>
+                        
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center justify-between">
+                                <h4 class="text-white font-medium truncate">Kreatif Ajans</h4>
+                                <span class="text-xs text-slate-400">1 yıldan fazla önce</span>
+                            </div>
+                            
+                            <div class="flex items-center justify-between mt-1">
+                                <p class="text-sm text-slate-400 truncate">Grafik tasarım portföyünüzü gönderdik. Değerlendirme sonucunu paylaşacağız.</p>
+                                <div class="bg-blue-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center ml-2">
+                                    1
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="p-4 border-b border-slate-700 cursor-pointer transition-colors hover:bg-slate-700" onclick="selectConversation(3)">
+                    <div class="flex items-start space-x-3">
+                        <div class="relative">
+                            <div class="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white font-semibold">
+                                SX
+                            </div>
+                            <div class="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-slate-800"></div>
+                        </div>
+                        
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center justify-between">
+                                <h4 class="text-white font-medium truncate">StartupXYZ</h4>
+                                <span class="text-xs text-slate-400">2 gün önce</span>
+                            </div>
+                            
+                            <div class="flex items-center justify-between mt-1">
+                                <p class="text-sm text-slate-400 truncate">Mülakat tarihini onayladık. Pazartesi saat 14:00'da görüşmek üzere.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="p-4 border-t border-slate-700 bg-slate-700">
+                <div class="flex items-center justify-between text-sm">
+                    <span class="text-slate-400">7 konuşma</span>
+                    <div class="flex items-center space-x-1">
+                        <div class="w-2 h-2 bg-green-500 rounded-full"></div>
+                        <span class="text-green-400">Çevrimiçi</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Side - Active Chat -->
+        <div class="w-1/2 flex flex-col">
+            
+            <!-- Chat Header -->
+            <div class="p-4 border-b border-slate-700 bg-slate-700">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                        <div class="relative">
+                            <div class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-semibold">
+                                TH
+                            </div>
+                            <div class="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-slate-800"></div>
+                        </div>
+                        <div>
+                            <h3 class="text-white font-semibold">TechCorp HR</h3>
+                            <p class="text-xs text-green-400">Çevrimiçi</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center space-x-2">
+                        <button class="text-slate-500 hover:text-white transition-colors p-1">
+                            <i data-lucide="search" class="w-4 h-4"></i>
+                        </button>
+                        <button class="text-slate-500 hover:text-white transition-colors p-1">
+                            <i data-lucide="phone" class="w-4 h-4"></i>
+                        </button>
+                        <button class="text-slate-500 hover:text-white transition-colors p-1">
+                            <i data-lucide="video" class="w-4 h-4"></i>
+                        </button>
+                        <button class="text-slate-500 hover:text-white transition-colors p-1">
+                            <i data-lucide="more-vertical" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Messages -->
+            <div id="chatMessages" class="flex-1 overflow-y-auto p-4 space-y-4">
+                <div class="flex justify-start">
+                    <div class="max-w-[80%] bg-slate-700 text-white rounded-lg px-3 py-2">
+                        <p class="text-sm">Merhaba, Frontend Developer pozisyonu hakkında bilgi alabilir miyim?</p>
+                        <p class="text-xs opacity-70 mt-1">1 yıldan az önce</p>
+                    </div>
+                </div>
+                
+                <div class="flex justify-end">
+                    <div class="max-w-[80%] bg-blue-600 text-white rounded-lg px-3 py-2">
+                        <p class="text-sm">Merhaba tabii ki. Bu pozisyon için React ve TypeScript deneyimi arıyoruz. Daha detaylı konuşabilir miyiz?</p>
+                        <p class="text-xs opacity-70 mt-1">1 yıldan fazla önce</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Message Input -->
+            <div class="p-4 border-t border-slate-700">
+                <div class="flex items-center space-x-2">
+                    <input
+                        id="chatInput"
+                        type="text"
+                        placeholder="Mesajınızı yazın..."
+                        onkeypress="handleChatKeyPress(event)"
+                        class="flex-1 bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white placeholder-slate-400 focus:border-blue-500 focus:outline-none text-sm"
+                    />
+                    <button onclick="sendMessage()" class="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-lg transition-colors">
+                        <i data-lucide="send" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        // Job data
+        const jobData = {
+            partTime: [
+                {
+                    title: 'Part-Time Garson',
+                    company: 'Köfteci Mehmet Usta',
+                    location: 'Kadıköy, İstanbul',
+                    salary: '15.000 - 18.000 TL',
+                    type: 'Part-Time',
+                    experience: 'Deneyim gerekmez',
+                    description: 'Hafta sonu ve akşam saatlerinde çalışacak garson aranıyor. Esnek çalışma saatleri.',
+                    benefits: ['Esnek saat', 'Yemek', 'Prim'],
+                    posted: '2 gün önce',
+                    isPremium: true
+                },
+                {
+                    title: 'Part-Time Kurye',
+                    company: 'Getir',
+                    location: 'Beşiktaş, İstanbul',
+                    salary: '12.000 - 15.000 TL',
+                    type: 'Part-Time',
+                    experience: 'Deneyim gerekmez',
+                    description: 'Motosiklet ehliyeti olan, esnek çalışma saatlerinde kurye aranıyor.',
+                    benefits: ['Esnek saat', 'Yakıt desteği', 'Prim'],
+                    posted: '1 gün önce',
+                    isPremium: false
+                },
+                {
+                    title: 'Part-Time Satış Danışmanı',
+                    company: 'Teknosa',
+                    location: 'Şişli, İstanbul',
+                    salary: '18.000 - 22.000 TL',
+                    type: 'Part-Time',
+                    experience: 'Deneyim gerekmez',
+                    description: 'Teknoloji ürünleri satışında deneyimli, müşteri odaklı satış danışmanı aranıyor.',
+                    benefits: ['Komisyon', 'Eğitim', 'İndirim'],
+                    posted: '3 gün önce',
+                    isPremium: true
+                }
+            ],
+            newGraduates: [
+                {
+                    title: 'Junior Yazılım Geliştirici',
+                    company: 'TechStart',
+                    location: 'Maslak, İstanbul',
+                    salary: '25.000 - 35.000 TL',
+                    type: 'Tam Zamanlı',
+                    experience: '0-2 yıl',
+                    description: 'React ve Node.js bilgisi olan, yeni mezun yazılım geliştirici aranıyor.',
+                    benefits: ['Uzaktan çalışma', 'Eğitim', 'Sağlık sigortası'],
+                    posted: '1 gün önce',
+                    isPremium: true
+                },
+                {
+                    title: 'Müşteri Hizmetleri Temsilcisi',
+                    company: 'Turkcell',
+                    location: 'Levent, İstanbul',
+                    salary: '20.000 - 25.000 TL',
+                    type: 'Tam Zamanlı',
+                    experience: '0-1 yıl',
+                    description: 'Müşteri odaklı, iletişim becerileri güçlü müşteri hizmetleri temsilcisi aranıyor.',
+                    benefits: ['Sağlık sigortası', 'Yemek', 'Prim'],
+                    posted: '2 gün önce',
+                    isPremium: false
+                },
+                {
+                    title: 'Pazarlama Asistanı',
+                    company: 'Global Marketing',
+                    location: 'Kadıköy, İstanbul',
+                    salary: '18.000 - 22.000 TL',
+                    type: 'Tam Zamanlı',
+                    experience: '0-1 yıl',
+                    description: 'Sosyal medya ve dijital pazarlama konularında deneyimli pazarlama asistanı aranıyor.',
+                    benefits: ['Esnek saat', 'Eğitim', 'Kariyer fırsatı'],
+                    posted: '4 gün önce',
+                    isPremium: true
+                }
+            ],
+            internship: [
+                {
+                    title: 'Yazılım Stajyeri',
+                    company: 'Microsoft Türkiye',
+                    location: 'Maslak, İstanbul',
+                    salary: '8.000 - 12.000 TL',
+                    type: 'Staj',
+                    experience: 'Öğrenci',
+                    description: 'Bilgisayar mühendisliği öğrencileri için 3 aylık yazılım geliştirme stajı.',
+                    benefits: ['Mentorluk', 'Sertifika', 'İş fırsatı'],
+                    posted: '1 hafta önce',
+                    isPremium: true
+                },
+                {
+                    title: 'Finans Stajyeri',
+                    company: 'Garanti BBVA',
+                    location: 'Levent, İstanbul',
+                    salary: '6.000 - 10.000 TL',
+                    type: 'Staj',
+                    experience: 'Öğrenci',
+                    description: 'İşletme/İktisat öğrencileri için finans departmanında staj imkanı.',
+                    benefits: ['Eğitim', 'Networking', 'Referans'],
+                    posted: '3 gün önce',
+                    isPremium: false
+                },
+                {
+                    title: 'Pazarlama Stajyeri',
+                    company: 'Unilever',
+                    location: 'Şişli, İstanbul',
+                    salary: '7.000 - 11.000 TL',
+                    type: 'Staj',
+                    experience: 'Öğrenci',
+                    description: 'Pazarlama bölümü öğrencileri için marka yönetimi stajı.',
+                    benefits: ['Proje deneyimi', 'Mentorluk', 'Kariyer fırsatı'],
+                    posted: '5 gün önce',
+                    isPremium: true
+                }
+            ],
+            expertise: [
+                {
+                    title: 'Freelance Grafik Tasarımcı',
+                    company: 'Creative Studio',
+                    location: 'Uzaktan',
+                    salary: 'Proje bazlı',
+                    type: 'Freelance',
+                    experience: '2+ yıl',
+                    description: 'Adobe Creative Suite bilgisi olan, logo ve kurumsal kimlik tasarımında deneyimli grafik tasarımcı.',
+                    benefits: ['Esnek saat', 'Uzaktan çalışma', 'Yüksek ücret'],
+                    posted: '1 gün önce',
+                    isPremium: true
+                },
+                {
+                    title: 'Part-Time Yazılım Geliştirici',
+                    company: 'TechCorp',
+                    location: 'Hibrit',
+                    salary: '30.000 - 45.000 TL',
+                    type: 'Part-Time',
+                    experience: '3+ yıl',
+                    description: 'React, Node.js ve MongoDB deneyimi olan, proje bazlı çalışacak yazılım geliştirici.',
+                    benefits: ['Uzaktan çalışma', 'Esnek saat', 'Yüksek ücret'],
+                    posted: '2 gün önce',
+                    isPremium: true
+                },
+                {
+                    title: 'Part-Time Çevirmen',
+                    company: 'Language Solutions',
+                    location: 'Uzaktan',
+                    salary: 'Kelime başına ücret',
+                    type: 'Freelance',
+                    experience: '1+ yıl',
+                    description: 'İngilizce-Türkçe çeviri yapabilecek, teknik doküman çevirisinde deneyimli çevirmen.',
+                    benefits: ['Esnek saat', 'Uzaktan çalışma', 'Çeşitli projeler'],
+                    posted: '3 gün önce',
+                    isPremium: false
+                }
+            ]
+        };
+
+        const categoryTitles = {
+            partTime: 'Part-Time İşler - Örnek İlanlar',
+            newGraduates: 'Yeni Mezunlar İçin İşler - Örnek İlanlar',
+            internship: 'Stajyer Pozisyonları - Örnek İlanlar',
+            expertise: 'Uzmanlık Gerektiren Part-Time İşler - Örnek İlanlar'
+        };
+
+        // Page navigation
+        function showPage(pageId) {
+            // Hide all pages
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            
+            // Show selected page
+            document.getElementById(pageId + 'Page').classList.add('active');
+        }
+
+        function closeNotificationPanel() {
+            document.getElementById('notificationPanel').style.display = 'none';
+        }
+
+        // Show profile modal
+        function showProfileModal() {
+            document.getElementById('profileModal').style.display = 'flex';
+            lucide.createIcons();
+        }
+
+        // Hide profile modal
+        function hideProfileModal() {
+            document.getElementById('profileModal').style.display = 'none';
+        }
+
+        // Show company modal
+        function showCompanyModal() {
+            document.getElementById('companyModal').style.display = 'flex';
+            lucide.createIcons();
+        }
+
+        // Hide company modal
+        function hideCompanyModal() {
+            document.getElementById('companyModal').style.display = 'none';
+        }
+
+        // Close modals when clicking outside
+        document.addEventListener('click', function(event) {
+            const profileModal = document.getElementById('profileModal');
+            const companyModal = document.getElementById('companyModal');
+            const profileButton = event.target.closest('button[onclick="showProfileModal()"]');
+            const companyButton = event.target.closest('button[onclick="showCompanyModal()"]');
+            
+            if (!profileButton && event.target === profileModal) {
+                hideProfileModal();
+            }
+            
+            if (!companyButton && event.target === companyModal) {
+                hideCompanyModal();
+            }
+        });
+
+        // Show job category
+        function showJobCategory(category) {
+            const jobListings = document.getElementById('jobListings');
+            const jobCategoryTitle = document.getElementById('jobCategoryTitle');
+            const jobListingsContent = document.getElementById('jobListingsContent');
+            
+            // Set title
+            jobCategoryTitle.textContent = categoryTitles[category];
+            
+            // Clear previous content
+            jobListingsContent.innerHTML = '';
+            
+            // Add job listings
+            jobData[category].forEach(job => {
+                const jobCard = document.createElement('div');
+                jobCard.className = 'card hover:border-blue-500 transition-all duration-300';
+                jobCard.innerHTML = `
+                    <div class="flex items-start justify-between">
+                        <div class="flex-1">
+                            <div class="flex items-center space-x-3 mb-3">
+                                <h3 class="text-lg font-semibold text-white">${job.title}</h3>
+                                ${job.isPremium ? '<span class="bg-blue-500 text-white text-xs px-2 py-1 rounded-full flex items-center"><i data-lucide="star" class="w-3 h-3 mr-1"></i>Premium</span>' : ''}
+                            </div>
+                            
+                            <div class="flex items-center space-x-4 mb-3 text-sm text-slate-400">
+                                <div class="flex items-center space-x-1">
+                                    <i data-lucide="building" class="w-4 h-4"></i>
+                                    <span>${job.company}</span>
+                                </div>
+                                <div class="flex items-center space-x-1">
+                                    <i data-lucide="map-pin" class="w-4 h-4"></i>
+                                    <span>${job.location}</span>
+                                </div>
+                                <div class="flex items-center space-x-1">
+                                    <i data-lucide="clock" class="w-4 h-4"></i>
+                                    <span>${job.type}</span>
+                                </div>
+                            </div>
+                            
+                            <p class="text-slate-400 mb-3">${job.description}</p>
+                            
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-4 text-sm">
+                                    <div class="flex items-center space-x-1 text-green-400">
+                                        <i data-lucide="dollar-sign" class="w-4 h-4"></i>
+                                        <span class="font-medium">${job.salary}</span>
+                                    </div>
+                                    <div class="flex items-center space-x-1 text-slate-400">
+                                        <i data-lucide="users" class="w-4 h-4"></i>
+                                        <span>${job.experience}</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="text-xs text-slate-500">
+                                    ${job.posted}
+                                </div>
+                            </div>
+                            
+                            <div class="mt-3 flex flex-wrap gap-2">
+                                ${job.benefits.map(benefit => `<span class="bg-slate-700 text-slate-400 text-xs px-2 py-1 rounded">${benefit}</span>`).join('')}
+                            </div>
+                        </div>
+                    </div>
+                `;
+                jobListingsContent.appendChild(jobCard);
+            });
+            
+            // Show job listings
+            jobListings.style.display = 'block';
+            
+            // Reinitialize icons
+            lucide.createIcons();
+        }
+
+        // Dark mode functionality
+        let isDarkMode = true;
+        
+        function toggleDarkMode() {
+            isDarkMode = !isDarkMode;
+            const darkModeIcon = document.getElementById('darkModeIcon');
+            const darkModeText = document.getElementById('darkModeText');
+            const body = document.body;
+            
+            if (isDarkMode) {
+                // Switch to dark mode
+                body.style.backgroundColor = '#0f172a';
+                body.style.color = '#f8fafc';
+                darkModeIcon.setAttribute('data-lucide', 'moon');
+                darkModeText.textContent = 'Koyu Tema';
+                
+                // Update header background
+                document.querySelector('header').className = 'bg-slate-800 border-b border-slate-700 px-6 py-4';
+                
+                // Update cards
+                document.querySelectorAll('.card').forEach(card => {
+                    card.style.backgroundColor = '#1e293b';
+                    card.style.borderColor = '#334155';
+                });
+            } else {
+                // Switch to light mode
+                body.style.backgroundColor = '#ffffff';
+                body.style.color = '#1f2937';
+                darkModeIcon.setAttribute('data-lucide', 'sun');
+                darkModeText.textContent = 'Açık Tema';
+                
+                // Update header background
+                document.querySelector('header').className = 'bg-white border-b border-gray-200 px-6 py-4';
+                
+                // Update cards
+                document.querySelectorAll('.card').forEach(card => {
+                    card.style.backgroundColor = '#f8fafc';
+                    card.style.borderColor = '#e2e8f0';
+                });
+            }
+            
+            // Reinitialize icons
+            lucide.createIcons();
+        }
+
+        // Chat functionality
+        let isChatOpen = false;
+        let selectedConversation = 1;
+        
+        function toggleChat() {
+            isChatOpen = !isChatOpen;
+            const chatButton = document.getElementById('chatButton');
+            const chatWindow = document.getElementById('chatWindow');
+            
+            if (isChatOpen) {
+                chatButton.style.display = 'none';
+                chatWindow.style.display = 'flex';
+            } else {
+                chatButton.style.display = 'block';
+                chatWindow.style.display = 'none';
+            }
+            
+            lucide.createIcons();
+        }
+        
+        function selectConversation(conversationId) {
+            selectedConversation = conversationId;
+            
+            // Update conversation selection styling
+            const conversations = document.querySelectorAll('[onclick^="selectConversation"]');
+            conversations.forEach(conv => {
+                conv.className = conv.className.replace(' bg-slate-700', '');
+                conv.className = conv.className.replace('hover:bg-slate-700', 'hover:bg-slate-700');
+            });
+            
+            // Highlight selected conversation
+            const selectedConv = document.querySelector(`[onclick="selectConversation(${conversationId})"]`);
+            if (selectedConv) {
+                selectedConv.className = selectedConv.className.replace('hover:bg-slate-700', '');
+                selectedConv.className += ' bg-slate-700';
+            }
+            
+            // Update chat header based on conversation
+            updateChatHeader(conversationId);
+            
+            // Show success message (optional)
+            console.log('Conversation selected:', conversationId);
+        }
+        
+        let activeFilter = 'completed';
+        
+        function handleFilterClick(filterType) {
+            activeFilter = filterType;
+            console.log('Filter clicked:', filterType);
+            
+            // Update active tab styling
+            document.querySelectorAll('#chatFilters button').forEach(btn => {
+                btn.classList.remove('text-blue-400', 'border-b', 'border-blue-400');
+                btn.classList.add('text-slate-500');
+            });
+            
+            const clickedButton = event.target;
+            clickedButton.classList.remove('text-slate-500');
+            clickedButton.classList.add('text-blue-400', 'border-b', 'border-blue-400');
+            
+            // Update conversation list based on filter
+            updateConversationList(filterType);
+        }
+        
+        function updateConversationList(filterType) {
+            const conversationList = document.getElementById('conversationList');
+            
+            let conversations = [];
+            
+            if (filterType === 'completed') {
+                conversations = [
+                    { name: 'TechCorp HR', avatar: 'TH', lastMessage: 'Merhaba tabii ki. Bu pozisyon için React ve TypeScript deneyimi arıyoruz.', timestamp: '1 yıldan fazla önce', unreadCount: 0, isOnline: true },
+                    { name: 'Kreatif Ajans', avatar: 'KA', lastMessage: 'Grafik tasarım portföyünüzü gönderdik. Değerlendirme sonucunu paylaşacağız.', timestamp: '1 yıldan fazla önce', unreadCount: 1, isOnline: false },
+                    { name: 'StartupXYZ', avatar: 'SX', lastMessage: 'Mülakat tarihini onayladık. Pazartesi saat 14:00\'da görüşmek üzere.', timestamp: '2 gün önce', unreadCount: 0, isOnline: true }
+                ];
+            } else if (filterType === 'online') {
+                conversations = [
+                    { name: 'ABC Yazılım', avatar: 'AY', lastMessage: 'Yazılım geliştirici pozisyonu için başvurunuzu aldık.', timestamp: '5 dakika önce', unreadCount: 0, isOnline: true },
+                    { name: 'XYZ İnşaat', avatar: 'XI', lastMessage: 'Proje yöneticisi pozisyonu için görüşme talep ediyoruz.', timestamp: '10 dakika önce', unreadCount: 1, isOnline: true },
+                    { name: 'Tech Solutions', avatar: 'TS', lastMessage: 'DevOps Engineer pozisyonu için teknik mülakat planlanıyor.', timestamp: '15 dakika önce', unreadCount: 0, isOnline: true }
+                ];
+            } else if (filterType === 'archive') {
+                conversations = [
+                    { name: 'Eski Şirket A', avatar: 'EA', lastMessage: 'Merhaba, iş ilanınız hakkında bilgi alabilir miyim?', timestamp: '1 ay önce', unreadCount: 0, isOnline: false },
+                    { name: 'Geçmiş Firma B', avatar: 'GF', lastMessage: 'Pozisyon dolduruldu, teşekkürler.', timestamp: '2 ay önce', unreadCount: 0, isOnline: false },
+                    { name: 'Eski İşveren C', avatar: 'EI', lastMessage: 'Mülakat sonucu olumsuz, başka fırsatlarda görüşürüz.', timestamp: '3 ay önce', unreadCount: 0, isOnline: false }
+                ];
+            }
+            
+            conversationList.innerHTML = '';
+            conversations.forEach((conv, index) => {
+                const convDiv = document.createElement('div');
+                convDiv.className = 'p-4 border-b border-slate-600 cursor-pointer hover:bg-slate-700 transition-colors';
+                convDiv.onclick = () => selectConversation(index + 1);
+                convDiv.innerHTML = `
+                    <div class="flex items-start space-x-3">
+                        <div class="relative">
+                            <div class="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white font-semibold">
+                                ${conv.avatar}
+                            </div>
+                            ${conv.isOnline ? '<div class="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-slate-800"></div>' : ''}
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center justify-between">
+                                <h4 class="text-white font-medium truncate">${conv.name}</h4>
+                                <span class="text-xs text-slate-500">${conv.timestamp}</span>
+                            </div>
+                            <div class="flex items-center justify-between mt-1">
+                                <p class="text-sm text-slate-500 truncate">${conv.lastMessage}</p>
+                                ${conv.unreadCount > 0 ? `<div class="bg-blue-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center ml-2">${conv.unreadCount}</div>` : ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
+                conversationList.appendChild(convDiv);
+            });
+        }
+        
+        function updateChatHeader(conversationId) {
+            const chatHeader = document.querySelector('#chatWindow .w-1/2 .p-4 .flex .space-x-3 h3');
+            const chatAvatar = document.querySelector('#chatWindow .w-1/2 .p-4 .flex .space-x-3 .w-10');
+            const messagesContainer = document.getElementById('chatMessages');
+            
+            const conversationNames = {
+                1: 'TechCorp HR',
+                2: 'Kreatif Ajans', 
+                3: 'StartupXYZ'
+            };
+            
+            const conversationAvatars = {
+                1: 'TH',
+                2: 'KA',
+                3: 'SX'
+            };
+            
+            const conversationMessages = {
+                1: [
+                    { text: 'Merhaba, Frontend Developer pozisyonu hakkında bilgi alabilir miyim?', sender: 'user', time: '1 yıldan az önce' },
+                    { text: 'Merhaba tabii ki. Bu pozisyon için React ve TypeScript deneyimi arıyoruz. Daha detaylı konuşabilir miyiz?', sender: 'other', time: '1 yıldan fazla önce' }
+                ],
+                2: [
+                    { text: 'Grafik tasarım portföyümü gönderdim. Değerlendirme ne zaman tamamlanacak?', sender: 'user', time: '2 gün önce' },
+                    { text: 'Portföyünüzü inceledik. Çok başarılı çalışmalarınız var. Pazartesi görüşmek üzere.', sender: 'other', time: '1 gün önce' }
+                ],
+                3: [
+                    { text: 'Mülakat tarihini onayladık. Pazartesi saat 14:00\'da görüşmek üzere.', sender: 'other', time: '2 gün önce' },
+                    { text: 'Teşekkürler! Pazartesi görüşmek üzere.', sender: 'user', time: '1 gün önce' }
+                ]
+            };
+            
+            if (chatHeader && chatAvatar) {
+                chatHeader.textContent = conversationNames[conversationId] || 'Unknown';
+                chatAvatar.textContent = conversationAvatars[conversationId] || '?';
+            }
+            
+            // Update messages
+            if (messagesContainer && conversationMessages[conversationId]) {
+                messagesContainer.innerHTML = '';
+                conversationMessages[conversationId].forEach(message => {
+                    const messageDiv = document.createElement('div');
+                    messageDiv.className = message.sender === 'user' ? 'flex justify-end' : 'flex justify-start';
+                    messageDiv.innerHTML = `
+                        <div class="max-w-[80%] ${message.sender === 'user' ? 'bg-blue-600 text-white' : 'bg-slate-700 text-white'} rounded-lg px-3 py-2">
+                            <p class="text-sm">${message.text}</p>
+                            <p class="text-xs opacity-70 mt-1">${message.time}</p>
+                        </div>
+                    `;
+                    messagesContainer.appendChild(messageDiv);
+                });
+            }
+        }
+        
+        function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            
+            if (message) {
+                const messagesContainer = document.getElementById('chatMessages');
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'flex justify-end';
+                messageDiv.innerHTML = `
+                    <div class="max-w-[80%] bg-blue-600 text-white rounded-lg px-3 py-2">
+                        <p class="text-sm">${message}</p>
+                        <p class="text-xs opacity-70 mt-1">${new Date().toLocaleTimeString('tr-TR', {hour: '2-digit', minute:'2-digit'})}</p>
+                    </div>
+                `;
+                messagesContainer.appendChild(messageDiv);
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                input.value = '';
+                lucide.createIcons();
+            }
+        }
+        
+        function handleChatKeyPress(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendMessage();
+            }
+        }
+
+        // Add fade-in animation to cards
+        document.addEventListener('DOMContentLoaded', function() {
+            const cards = document.querySelectorAll('.card');
+            cards.forEach((card, index) => {
+                card.style.animationDelay = `${index * 0.1}s`;
+                card.classList.add('fade-in');
+            });
+        });
+    </script>
+</body>
+</html> 
