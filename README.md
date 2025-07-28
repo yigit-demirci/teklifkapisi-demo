@@ -130,6 +130,10 @@ npm run build
 npm run preview
 ```
 
+## 🎥 Demo Video
+
+Bu demo video, projenin nasıl çalıştığını ve kullanıcı arayüzünü gösteriyor: [Demo Video'yu İzle](https://youtu.be/YGXdkC1HQho)
+
 ## 📄 Lisans
 
 Bu proje demo amaçlı geliştirilmiştir. Ticari kullanım için lisans gerekebilir.
